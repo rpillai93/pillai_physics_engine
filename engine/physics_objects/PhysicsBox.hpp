@@ -15,7 +15,6 @@ class PhysicsBox : public sf::RectangleShape, public IPhysicsObject {
 
 private:
 	ShapeType m_ShapeType;
-	sf::Vector2f m_Displacement;
 	sf::Vector2f m_Velocity;
 	sf::Vector2f m_Acceleration;
 	sf::Vector2f m_ForceAccumulator;

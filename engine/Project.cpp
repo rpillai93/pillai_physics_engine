@@ -19,9 +19,18 @@ void Project::Initialize()
 	mPhysicsWorld = new PhysicsWorld();
 	//SET THE GROUND FOR THE WORLD
 	float groundThickness = 200;
-	mPhysicsWorld->setGround(new PhysicsBox(sf::Vector2f(0, windowSize.y - groundThickness), windowSize.x, groundThickness));
-	mPhysicsWorld->getGround()->setIsFixedPosition(true);
-
+	mPhysicsWorld->mGround = new PhysicsBox(sf::Vector2f(0, windowSize.y - groundThickness), windowSize.x, groundThickness);
+	mPhysicsWorld->mGround->setInverseMass(0.f);
+	mPhysicsWorld->yConstraintLow = 0; mPhysicsWorld->yConstraintHigh = windowSize.y - groundThickness;
+	mPhysicsWorld->PhysicsObjects.emplace_back(mPhysicsWorld->mGround);
+	float wallThickness = 200;
+	mPhysicsWorld->mWall1 = new PhysicsBox(sf::Vector2f(0, 0), wallThickness, windowSize.y - groundThickness);
+	mPhysicsWorld->mWall1->setInverseMass(0.f);
+	mPhysicsWorld->mWall2 = new PhysicsBox(sf::Vector2f(windowSize.x - wallThickness, 0), wallThickness, windowSize.y - groundThickness);
+	mPhysicsWorld->mWall2->setInverseMass(0.f);
+	mPhysicsWorld->xConstraintLow = wallThickness; mPhysicsWorld->xConstraintHigh = windowSize.x - wallThickness;
+	mPhysicsWorld->PhysicsObjects.emplace_back(mPhysicsWorld->mWall1);
+	mPhysicsWorld->PhysicsObjects.emplace_back(mPhysicsWorld->mWall2);
 
 	m_Event.window = &m_Window;
 	m_Event.world = mPhysicsWorld;
@@ -35,8 +44,8 @@ void Project::Update()
 	m_FinalTime = std::chrono::high_resolution_clock::now();
 	deltaTime = std::chrono::duration<float>(m_FinalTime - m_InitialTime).count();
 	m_InitialTime = m_FinalTime;
-
-	mPhysicsWorld->Update(deltaTime);
+	float t = 0.0003;
+	mPhysicsWorld->Update(t);
 }
 
 
@@ -44,8 +53,10 @@ void Project::Draw()
 {
 	m_Window.clear();
 
-	PhysicsBox* ground = mPhysicsWorld->getGround();
-	m_Window.draw(*ground->getShape());
+	m_Window.draw(*mPhysicsWorld->mGround->getShape());
+	m_Window.draw(*mPhysicsWorld->mWall1->getShape());
+	m_Window.draw(*mPhysicsWorld->mWall2->getShape());
+
 
 	for (auto* obj : mPhysicsWorld->PhysicsObjects) {
 		auto* circle = dynamic_cast<PhysicsSphere*>(obj);
@@ -53,6 +64,7 @@ void Project::Draw()
 			m_Window.draw(*circle);
 		}
 	}
+
 
 	m_Window.display();
 }

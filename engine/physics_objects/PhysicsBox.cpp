@@ -2,11 +2,26 @@
 
 void PhysicsBox::Initialize()
 {
-
+	setVelocity(0.f, 0.f);
+	setAcceleration(0.f, 4600.f); //assuming gravity is some large value here
 }
 
 void PhysicsBox::Update(float deltaTime)
 {
+	const sf::Vector2<float>& p = getPosition();
+	const sf::Vector2<float>& v = getVelocity();
+	const sf::Vector2<float>& a = getAcceleration();
+
+
+	// Formula used below: 
+	// displacement = v * deltaTime + 0.5 * a * (deltaTime)^2 approximately equals v * deltaTime for small deltaTime:
+	setPosition(p.x + v.x * deltaTime, p.y + v.y * deltaTime); // approximated
+
+	// v(final) = v(initial) + a * deltaTime
+	setVelocity(v.x + a.x * deltaTime, v.y + a.y * deltaTime);
+
+	setAcceleration(a.x, a.y); // unchanged for only gravity acting on the body
+
 }
 
 const sf::Vector2f& PhysicsBox::getPosition() const

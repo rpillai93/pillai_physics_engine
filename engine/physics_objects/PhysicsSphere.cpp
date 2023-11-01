@@ -50,22 +50,27 @@ const sf::Vector2f& PhysicsSphere::getCenterOfMass()
 
 void PhysicsSphere::Initialize()
 {
-	const sf::Vector2f& p = getPosition();
-	m_Displacement.x = p.x; m_Displacement.y = p.y;
-	m_Velocity.x = 0; m_Velocity.y = 0;
-	m_Acceleration.x = 0; m_Acceleration.y = 4600.f;
+	setVelocity(0.f, 0.f);
+	setAcceleration(0.f, 4600.f); //assuming gravity is some large value here
 }
 
 void PhysicsSphere::Update(float deltaTime)
 {
-	sf::Vector2<float> p = getPosition();
-	m_Displacement.x = (m_Velocity.x * deltaTime) + 0.5f * m_Acceleration.x * (deltaTime * deltaTime);
-	if (m_Displacement.x < 0.009) m_Displacement.x = 0; if (m_Displacement.y < 0.009) m_Displacement.y = 0;
-	m_Displacement.y = (m_Velocity.y * deltaTime) + 0.5f * m_Acceleration.y * (deltaTime * deltaTime);
-	m_Velocity.x = m_Velocity.x + m_Acceleration.x * deltaTime;
-	m_Velocity.y = m_Velocity.y + m_Acceleration.y * deltaTime;
-	setPosition(p.x + m_Displacement.x, p.y + m_Displacement.y);
+	const sf::Vector2<float>& p = getPosition();
+	const sf::Vector2<float>& v = getVelocity();
+	const sf::Vector2<float>& a = getAcceleration();
 
+
+	// Formula used below: 
+	// displacement = v * deltaTime + 0.5 * a * (deltaTime)^2 approximately equals v * deltaTime for small deltaTime:
+	setPosition(p.x + v.x * deltaTime, p.y + v.y * deltaTime); // approximated
+
+	// v(final) = v(initial) + a * deltaTime
+	setVelocity(v.x + a.x * deltaTime, v.y + a.y * deltaTime);
+
+	setAcceleration(a.x, a.y); // unchanged for only gravity acting on the body
+
+	std::cout << "V = " << v.y << '\n';
 }
 
 float PhysicsSphere::getInverseMass() const

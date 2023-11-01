@@ -29,7 +29,10 @@ void EventHandler::handleMouseButtonPressed()
 
 	switch (mouseButton.button) {
 	case sf::Mouse::Button::Left:
-		world->addObjectToWorld(new PhysicsSphere(sf::Vector2f(mouseButton.x, mouseButton.y), 30, 32, c));
+		if (mouseButton.x > world->xConstraintLow && mouseButton.x < world->xConstraintHigh &&
+			mouseButton.y > world->yConstraintLow && mouseButton.y < world->yConstraintHigh) {
+			world->addObjectToWorld(new PhysicsSphere(sf::Vector2f(mouseButton.x, mouseButton.y), 30, 32, c));
+		}
 		break;
 	case sf::Mouse::Button::Right:
 		break;

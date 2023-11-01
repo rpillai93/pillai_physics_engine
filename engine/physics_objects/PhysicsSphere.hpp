@@ -22,7 +22,6 @@ private:
 	//// *m_Acceleration = velocity with respect to time between two consecutive frames (calculation begins from 3rd frame onwards)
 	////////////////////////////////////////////////////////////
 	ShapeType m_ShapeType;
-	sf::Vector2f m_Displacement;
 	sf::Vector2f m_Velocity;
 	sf::Vector2f m_Acceleration;
 	sf::Vector2f m_ForceAccumulator;

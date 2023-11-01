@@ -3,6 +3,7 @@
 #include <chrono>
 #include <iostream>
 #include "contacts/ObjectContact.hpp"
+#include "contacts/ContactResolver.hpp"
 class PhysicsSphere;
 class PhysicsBox;
 class IPhysicsObject;
@@ -11,30 +12,36 @@ class IPhysicsObject;
 class PhysicsWorld {
 private:
 
-	PhysicsBox* mGround;
+
+
 	unsigned int numObjects = 1; // Assuming ground always exists
 public:
+	int step = 0;
+	PhysicsBox* mGround;
+	PhysicsBox* mWall1;
+	PhysicsBox* mWall2;
+	float xConstraintLow;
+	float xConstraintHigh;
+	float yConstraintLow;
+	float yConstraintHigh;
 	PhysicsWorld() = default;
 	~PhysicsWorld() {
 		//DELETE OBJECTS
 		for (auto* it : PhysicsObjects) {
 			delete it;
 		}
-		delete mGround;
 		PhysicsObjects.clear();
-
 
 
 		std::cout << "DELETED " << "PHYSICS WORLD" << '\n';
 	}
 	std::vector<IPhysicsObject*> PhysicsObjects;
 	std::vector<ObjectContact> ObjectContacts;
+	ContactResolver resolver;
 	void Initialize();
 	void Update(float deltaTime);
-	void setGround(PhysicsBox* ground);
 	void setContacts();
 	void addObjectToWorld(IPhysicsObject* object);
-	PhysicsBox* getGround() const;
 
 	/* All collision check functions return the penetration distance
 	/* If penetration > 0, the bodies are penetrating

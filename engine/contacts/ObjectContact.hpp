@@ -24,4 +24,5 @@ public:
 	void resolve(float deltaTime);
 	float getSeparatingVelocity() const;
 	void resolveVelocity(float deltaTime);
+	void resolveInterpenetration(float deltaTime);
 };

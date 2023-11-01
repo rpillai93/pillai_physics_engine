@@ -25,36 +25,80 @@ void PhysicsWorld::Update(float deltaTime)
 	// 4. Call Update() on all objects 
 
 
-	for (auto* object : PhysicsObjects) {
-		float penetration = checkCollisionObjectToGround(object, mGround);
+	//for (auto* object : PhysicsObjects) {
+	//	float penetration = checkCollisionObjectToObject(object, mGround);
 
-		if (penetration > 0) {
-			//If collision occurs, we resolve for interpenetration here
-			std::vector<IPhysicsObject*> obj; obj.emplace_back(object);
-			ObjectContacts.emplace_back(obj, 0.7f, penetration, sf::Vector2<float>(0.f, -1.0f));
-			auto* circle = dynamic_cast<PhysicsSphere*>(object);
-			if (circle != nullptr) {
-				sf::Vector2<float> objectCOM = object->getCenterOfMass();
-				sf::Vector2<float> penetrationVector(object->getVelocity().x, object->getVelocity().y);
-				mymath::vector2::normalize(penetrationVector);
-				penetrationVector *= -penetration;
-				objectCOM += penetrationVector;
-				float radius = circle->getRadius();
-				object->setPosition(objectCOM.x - radius, objectCOM.y - radius);
+	//	if (penetration > 0) {
+	//		//If collision occurs, we resolve for interpenetration here
+	//		std::vector<IPhysicsObject*> obj; obj.emplace_back(object);
+	//		sf::Vector2<float> contactNormal(0.f, -1.0f);                                     /*HARD CODED VALUE*/
+	//		ObjectContacts.emplace_back(obj, 0.7f, penetration, contactNormal); // Add contacts for resolution
+	//	}
+	//	else {
+	//		object->Update(deltaTime);
+	//	}
+	//}
+
+
+
+
+	for (int i = PhysicsObjects.size() - 1; i >= 3; i--) {
+		auto object = PhysicsObjects[i];
+		for (int j = i - 1; j >= 0; j--) {
+
+			float penetration = checkCollisionObjectToObject(object, PhysicsObjects[j]);
+
+			if (penetration > 0) {
+				//If collision occurs, we resolve for interpenetration here
+				std::vector<IPhysicsObject*> obj;
+				if (object->getInverseMass() > 0)
+					obj.emplace_back(object);
+				if (PhysicsObjects[j]->getInverseMass() > 0)
+					obj.emplace_back(PhysicsObjects[j]);
+				sf::Vector2<float> contactNormal(0.f, -1.f);
+				float restitution = 0.4;
+				if (j == 0) {
+					restitution = 0.7;
+				}
+				else if (j == 1) {
+					contactNormal.x = 1.0f;
+					contactNormal.y = 0.f;
+					restitution = 0.7;
+
+				}
+				else if (j == 2) {
+					contactNormal.x = -1.0f;
+					contactNormal.y = 0.f;
+					restitution = 0.7;
+				}
+
+				if (object->getShapeType() == ShapeType::SPHERE && PhysicsObjects[j]->getShapeType() == ShapeType::SPHERE) {
+					auto& pos1 = object->getCenterOfMass();
+					auto& pos2 = PhysicsObjects[j]->getCenterOfMass();
+					contactNormal.x = pos1.x - pos2.x;
+					contactNormal.y = pos1.y - pos2.y;
+					mymath::vector2::normalize(contactNormal);
+				}
+
+				ObjectContacts.emplace_back(obj, restitution, penetration, contactNormal); // Add contacts for resolution
 			}
-		}
-		else {
-			object->Update(deltaTime);
+			else {
+				object->Update(deltaTime);
+			}
 		}
 	}
 
 	if (ObjectContacts.size() > 0) {
-		for (auto& contact : ObjectContacts) {
-			contact.resolve(deltaTime);
-		}
+		resolver.setIterations(ObjectContacts.size()); // setting number of iterations to same size as num contacts
+		resolver.resolveContacts(ObjectContacts, ObjectContacts.size(), deltaTime);
 		ObjectContacts.clear();
 		setContacts();
 	}
+
+
+
+
+
 
 }
 
@@ -63,27 +107,18 @@ void PhysicsWorld::setContacts()
 	ObjectContacts.reserve((numObjects * (numObjects - 1)) / 2);
 }
 
-void PhysicsWorld::setGround(PhysicsBox* ground)
-{
-	mGround = ground;
-}
-
 void PhysicsWorld::addObjectToWorld(IPhysicsObject* object)
 {
 	if (!object->getInitializeComplete())
 	{
 		object->Initialize();
+		object->setInverseMass(1.0f);
 		object->setInitializeComplete();
 	}
 
 	PhysicsObjects.emplace_back(object);
 
 	numObjects++;
-}
-
-PhysicsBox* PhysicsWorld::getGround() const
-{
-	return mGround;
 }
 
 float PhysicsWorld::checkCollisionSphereToBox(PhysicsSphere* s, PhysicsBox* b)
