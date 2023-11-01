@@ -10,3 +10,6 @@ To run this project on Visual Studio 2015 or higher:
 5. Run Visual Studio -> Open a project or solution
 6. Inside of the "_build" folder, run the "PhysicsEngine.sln" solution file.
 7. Once the project opens up, build on Release / Debug (x64) 
+
+Wait for the project to finish building, it might take a while when building
+the first time. 
