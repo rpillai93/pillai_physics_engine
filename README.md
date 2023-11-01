@@ -1,5 +1,5 @@
-# pillai_physics_engine
-2-D Physics Engine coded in plain C++ using the SFML graphics library
+# Welcome to my 2-D Physics Engine!
+This is s 2-D Physics Engine simulation coded in plain C++ using the SFML graphics library.
 
 ### Instructions
 To run this project on Visual Studio 2015 or higher:
