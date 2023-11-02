@@ -95,11 +95,6 @@ void PhysicsWorld::Update(float deltaTime)
 		setContacts();
 	}
 
-
-
-
-
-
 }
 
 void PhysicsWorld::setContacts()

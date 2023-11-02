@@ -3,8 +3,9 @@
 
 void ObjectContact::resolve(float deltaTime)
 {
-	resolveVelocity(deltaTime);
+
 	resolveInterpenetration(deltaTime);
+	resolveVelocity(deltaTime);
 }
 
 float ObjectContact::getSeparatingVelocity() const
@@ -26,22 +27,24 @@ void ObjectContact::resolveVelocity(float deltaTime)
 	}
 
 	float finalSeparatingVelocity = -separatingVelocity * m_CoeffRestitution;
+
 	sf::Vector2<float> accelerationAffectingVelocity = m_ContactObjects[0]->getAcceleration();
 	if (m_ContactObjects.size() > 1) {
 		accelerationAffectingVelocity -= m_ContactObjects[1]->getAcceleration();
 	}
 
 	float seperatingVelocityDueToAcceleration = mymath::vector2::dotProduct(accelerationAffectingVelocity, m_ContactNormal) * deltaTime;
-	std::cout << "seperatingVelocityDueToAcceleration= " << seperatingVelocityDueToAcceleration << '\n';
+
 	if (seperatingVelocityDueToAcceleration < 0) // build up is causing closing velocity instead, we need to correct this error
 	{
 		finalSeparatingVelocity += m_CoeffRestitution * seperatingVelocityDueToAcceleration;
+
 		if (finalSeparatingVelocity < 0) {
 			finalSeparatingVelocity = 0; //if there is closing velocity after accounting for acceleration, we set it to 0
 		}
 	}
 	float deltaVelocity = finalSeparatingVelocity - separatingVelocity;
-	std::cout << "finalSeparatingVelocity, separatingVelocity= " << finalSeparatingVelocity << " " << separatingVelocity << '\n';
+
 	float totalInverseMass = m_ContactObjects[0]->getInverseMass();
 	if (m_ContactObjects.size() > 1) {
 		totalInverseMass += m_ContactObjects[1]->getInverseMass();
@@ -54,6 +57,7 @@ void ObjectContact::resolveVelocity(float deltaTime)
 
 	//Apply impulse to body 1
 	const sf::Vector2f velBody1 = m_ContactObjects[0]->getVelocity();
+
 	m_ContactObjects[0]->setVelocity(velBody1.x + impulsePerIMass.x * m_ContactObjects[0]->getInverseMass(), velBody1.y + impulsePerIMass.y * m_ContactObjects[0]->getInverseMass());
 
 	//Apply impulse to body 2 if it exists

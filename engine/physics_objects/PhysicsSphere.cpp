@@ -51,7 +51,7 @@ const sf::Vector2f& PhysicsSphere::getCenterOfMass()
 void PhysicsSphere::Initialize()
 {
 	setVelocity(0.f, 0.f);
-	setAcceleration(0.f, 4600.f); //assuming gravity is some large value here
+	setAcceleration(0.f, 49.f); //assuming gravity is some large value here
 }
 
 void PhysicsSphere::Update(float deltaTime)
@@ -68,9 +68,7 @@ void PhysicsSphere::Update(float deltaTime)
 	// v(final) = v(initial) + a * deltaTime
 	setVelocity(v.x + a.x * deltaTime, v.y + a.y * deltaTime);
 
-	setAcceleration(a.x, a.y); // unchanged for only gravity acting on the body
 
-	std::cout << "V = " << v.y << '\n';
 }
 
 float PhysicsSphere::getInverseMass() const
