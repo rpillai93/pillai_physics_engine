@@ -1,6 +1,8 @@
 # Welcome to my 2-D Physics Engine!
 This is s 2-D Physics Engine simulation coded in plain C++ using the SFML graphics library.
 
+Work is still in Progress and is continuously ongoing so feel free to reach out to collab!
+
 ### Instructions
 To run this project on Visual Studio 2015 or higher:
 1. Ensure that CMake version 3.14 or above (non RC) is installed from https://cmake.org/download/
